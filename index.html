@@ -182,20 +182,20 @@
         pauseStatus = "Noch 15 Minuten Pause.";
         countdownTarget = new Date(today.setMinutes(15, 0, 0));
         startCountdown(countdownTarget, "countdown");
-        document.getElementById("pause-popup").style.display = "none"; // Unterricht anzeigen
+        document.getElementById("pause-popup").style.display = "none"; // Pop-up ausblenden
         document.getElementById("mittagessen-container").style.display = "none"; // Mittagessen ausblenden
       } 
       // Pause 10:15 bis 11:15 (Montags)
       else if (hours === 10 && minutes >= 15 && minutes < 60 && dayOfWeek === 1) {
         pauseStatus = "Kein Unterricht! Durchgang Verboten!";
-        document.getElementById("pause-popup").style.display = "none"; // Unterricht anzeigen
+        document.getElementById("pause-popup").style.display = "none"; // Pop-up ausblenden
         document.getElementById("mittagessen-container").style.display = "block"; // Mittagessen anzeigen
         document.getElementById("mittagessen-aktuell").textContent = mittagessenPlan[dayOfWeek - 1]; // Mittagessen Montag
       } 
       // Pause 11:15 bis 11:30 (Di-Fr)
       else if (hours === 11 && minutes < 30 && dayOfWeek >= 2 && dayOfWeek <= 5) {
         pauseStatus = "Kein Unterricht! Durchgang Verboten!";
-        document.getElementById("pause-popup").style.display = "none"; // Unterricht anzeigen
+        document.getElementById("pause-popup").style.display = "none"; // Pop-up ausblenden
         document.getElementById("mittagessen-container").style.display = "block"; // Mittagessen anzeigen
         document.getElementById("mittagessen-aktuell").textContent = mittagessenPlan[dayOfWeek + 1]; // Mittagessen Di-Fr
       } 
@@ -204,18 +204,18 @@
         pauseStatus = "Pause bis 13:00 Uhr.";
         countdownTarget = new Date(today.setHours(13, 0, 0, 0));
         startCountdown(countdownTarget, "countdown");
-        document.getElementById("pause-popup").style.display = "none"; // Unterricht anzeigen
+        document.getElementById("pause-popup").style.display = "none"; // Pop-up ausblenden
         document.getElementById("mittagessen-container").style.display = "none"; // Mittagessen ausblenden
       }
       // Ab 13 Uhr: Unterricht beendet
       else if (hours >= 13) {
         pauseStatus = "Unterricht beendet!";
-        document.getElementById("pause-popup").style.display = "none"; // Unterricht anzeigen
+        document.getElementById("pause-popup").style.display = "none"; // Pop-up ausblenden
         document.getElementById("mittagessen-container").style.display = "none"; // Mittagessen ausblenden
       } 
       // Ansonsten: Unterricht
       else {
-        document.getElementById("pause-popup").style.display = "flex"; // Unterricht anzeigen
+        document.getElementById("pause-popup").style.display = "flex"; // Pop-up für Unterricht anzeigen
         document.getElementById("mittagessen-container").style.display = "none"; // Mittagessen ausblenden
       }
 

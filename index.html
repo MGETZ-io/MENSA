@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mensa Info</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 600px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    #countdown {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: red;
+    }
+
+    .essen, .pausen {
+      margin-bottom: 20px;
+    }
+
+    .power-off {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mensa Info</h1>
+
+    <div class="essen" id="mittagessen-container">
+      <h2>Aktuelles Mittagessen</h2>
+      <p id="mittagessen-aktuell">Lade Mittagessen...</p>
+    </div>
+
+    <div class="essen" id="mittagessen-morgen-container">
+      <h2>Mittagessen morgen</h2>
+      <p id="mittagessen-morgen">Lade Mittagessen...</p>
+    </div>
+
+    <div class="pausen" id="pausen-container">
+      <h2>Pause</h2>
+      <p id="pause-status">Lade Pause...</p>
+      <div id="countdown"></div>
+    </div>
+
+    <div id="power-off-message" class="power-off" style="display: none;">
+      POWER OFF! Please turn on Mensa_Receiver!
+    </div>
+  </div>
+
+  <script>
+    // 2-Wochen-Mittagessen-Plan (14 Tage)
+    const mittagessenPlan = [
+      "Schnitzel mit Pommes",      // Tag 1 (Montag)
+      "Gemüsepfanne mit Reis",    // Tag 2 (Dienstag)
+      "Spaghetti Bolognese",      // Tag 3 (Mittwoch)
+      "Hähnchen mit Kartoffeln",  // Tag 4 (Donnerstag)
+      "Vegetarische Lasagne",     // Tag 5 (Freitag)
+      "Rindfleisch mit Nudeln",   // Tag 6 (Samstag)
+      "Currywurst mit Reis",      // Tag 7 (Sonntag)
+      "Pizza Margherita",         // Tag 8 (Montag)
+      "Lasagne",                  // Tag 9 (Dienstag)
+      "Wiener Schnitzel",         // Tag 10 (Mittwoch)
+      "Kartoffelsalat mit Würstchen", // Tag 11 (Donnerstag)
+      "Gemüseauflauf",            // Tag 12 (Freitag)
+      "Nudeln mit Tomatensauce",  // Tag 13 (Samstag)
+      "Frikadellen mit Reis",     // Tag 14 (Sonntag)
+    ];
+
+    // Funktion zur Berechnung des Countdown-Timers
+    function startCountdown(targetTime, elementId) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const remainingTime = targetTime - now;
+
+        if (remainingTime <= 0) {
+          clearInterval(interval);
+          document.getElementById(elementId).textContent = "Pause beendet!";
+        } else {
+          const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+          document.getElementById(elementId).textContent = `Noch ${minutes} Minuten und ${seconds} Sekunden bis Pause endet.`;
+        }
+      }, 1000);
+    }
+
+    // Funktion zur Anzeige des Mittagessen
+    function getMittagessen() {
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 = Sonntag, 1 = Montag, etc.
+
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        // Wenn Wochenende (Samstag oder Sonntag)
+        document.getElementById("mittagessen-container").style.display = "none";
+        document.getElementById("mittagessen-morgen-container").style.display = "none";
+        document.getElementById("pausen-container").style.display = "none";
+        document.getElementById("power-off-message").style.display = "block";
+      } else {
+        // Wenn Werktag (Montag bis Freitag)
+        const mittagessenAktuell = mittagessenPlan[(dayOfWeek) % mittagessenPlan.length];
+        const mittagessenMorgen = mittagessenPlan[(dayOfWeek + 1) % mittagessenPlan.length];
+
+        document.getElementById("mittagessen-aktuell").textContent = `Heute gibt es: ${mittagessenAktuell}`;
+        document.getElementById("mittagessen-morgen").textContent = `Das gibt es morgen: ${mittagessenMorgen}`;
+      }
+    }
+
+    // Funktion zur Anzeige der Pausenstatus
+    function handlePausen() {
+      const today = new Date();
+      const hours = today.getHours();
+      const minutes = today.getMinutes();
+      const dayOfWeek = today.getDay(); // 0 = Sonntag, 1 = Montag, etc.
+
+      let pauseStatus = "";
+      let countdownTarget = null;
+
+      // 10:00 Pause Countdown (bis 10:15)
+      if (hours === 10 && minutes < 15) {
+        pauseStatus = "Noch 15 Minuten Pause.";
+        countdownTarget = new Date(today.setMinutes(15, 0, 0));
+        startCountdown(countdownTarget, "countdown");
+      } 
+      // Zwischen 10:15 und 11:15
+      else if (hours === 10 && minutes >= 15 && minutes < 60) {
+        pauseStatus = "Kein Mensa-Verkauf. Durchgang Verboten!";
+      } 
+      // Zwischen 11:15 und 12:00 (nur Montags)
+      else if (hours === 11 && minutes <= 15 && dayOfWeek === 1) {
+        pauseStatus = "Keine Pause, aber Mittagessen verfügbar.";
+      }
+      // Restliche Zeit bis 11:00 an Wochentagen
+      else if (hours === 11 && minutes < 15) {
+        pauseStatus = "Noch bis 11:00 Uhr.";
+        countdownTarget = new Date(today.setMinutes(11, 0, 0));
+        startCountdown(countdownTarget, "countdown");
+      }
+      // Pause um 12:30 bis 13:00
+      else if (hours === 12 && minutes >= 30 && minutes < 60) {
+        pauseStatus = "Pause bis 13:00.";
+        countdownTarget = new Date(today.setHours(13, 0, 0, 0));
+        startCountdown(countdownTarget, "countdown");
+      }
+      // Ab 13 Uhr Mensa geschlossen
+      else if (hours >= 13) {
+        pauseStatus = "Mensa für heute geschlossen. Komm morgen wieder!";
+      }
+
+      document.getElementById("pause-status").textContent = pauseStatus;
+    }
+
+    // Initialisierung der Webseite
+    function init() {
+      getMittagessen();
+      handlePausen();
+    }
+
+    // Bei Laden der Seite aufrufen
+    window.onload = init;
+  </script>
+</body>
+</html>
